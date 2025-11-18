@@ -1,0 +1,16 @@
+Company: BrightFuture Labs
+Employee: Riya Sharma
+Month: October 2025
+
+Earnings:
+- Basic Pay: ₹32,000
+- HRA: ₹12,000
+- Special Allowance: ₹6,500
+- Performance Bonus: ₹3,000
+
+Deductions:
+- PF: ₹3,900
+- Professional Tax: ₹200
+
+Net Pay: ₹49,400 credited via NEFT on 30 Oct 2025
+
