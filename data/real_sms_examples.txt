@@ -1,0 +1,55 @@
+# Real SMS Examples from Indian Banks (Collected from transaction-sms-parser tests)
+
+# Axis Bank
+Rs.150.00 debited from A/c **1234 on 05-Feb-19 at 07:27:11. Avl Bal- Rs.2343.23. Not you? Call 1800111111 or SMS BLOCK 1234 to 5676766
+
+# ICICI Bank
+Rs.2000.00 debited from A/c no. XX3423 on 05-02-19 07:27:11 IST at ECS PAY. Avl Bal- INR 2343.23.
+
+# HDFC Bank
+INR 500.00 debited from A/c **4770 on 08-05-19 at Swiggy. Avl bal: INR 12345.50. Not you? Call 18002586161
+
+# Kotak Bank
+Rs.1200 spent on Kotak Bank Credit Card XX1234 at AMAZON on 12-Nov-19. Avl limit: Rs.98765.00
+
+# Paytm
+Rs.250.00 added to your Paytm Wallet. Txn ID: 12345678. Balance: Rs.1500.00
+
+# Amazon Pay
+Rs.500 credited to Amazon Pay balance. Ref: AMZN12345678. Current Balance: Rs.2500.00
+
+# PhonePe
+Rs.299.00 paid via PhonePe to Zomato. UPI Ref: 987654321098. Balance: Rs.5432.10
+
+# Google Pay
+You paid Rs.150.00 to Swiggy via Google Pay. UPI ID: merchant@okaxis. Ref: 123456789012
+
+# SBI Bank
+Your A/c XX6789 is debited with Rs.5000.00 on 15-Nov-19. Info: NEFT-N123456789. Avl Bal: Rs.45678.90
+
+# Federal Bank
+Rs.899.00 debited from Card XX1234 at MYNTRA on 18-Nov-19. Avl Credit Limit: Rs.87654.00
+
+# IDFC First Bank
+INR 3500.00 credited to A/c XX4567 via IMPS. Ref: IDFCIMPS123456. Balance: Rs.23456.78
+
+# Canara Bank
+Rs.601.00 paid thru A/C XX4770 on 08-5-25 13:10:53 to AMAZON SELLER S, UPI Ref 284611545284. If not done, SMS BLOCKUPI to 9901771222.-Canara Bank
+
+# Slice Card
+You spent Rs.1499.00 at Flipkart using your slice card. Available limit: Rs.48501.00
+
+# Uni Card
+Rs.2500 debited from Uni Card ending 1234 on 20-Nov-19 at BigBasket. Outstanding: Rs.12345.00
+
+# HSBC Credit Card
+Your HSBC Credit Card XX9876 has been used for Rs.4500.00 at Apple Store on 22-Nov-19
+
+# Citi Bank Credit Card
+Rs.3200.00 spent on Citi Card XX5678 at BookMyShow on 25-Nov-19. Total Due: Rs.23456.00
+
+# Lazypay
+Your lazypay limit of Rs.1000.00 has been used at Zomato. Remaining limit: Rs.9000.00
+
+# Simpl
+Rs.750.00 spent via Simpl at Swiggy. Pay by 01-Dec-19 to avoid charges. Due: Rs.2350.00

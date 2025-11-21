@@ -2,7 +2,7 @@
 Train XGBoost model for FairScore prediction.
 
 This script:
-1. Loads synthetic_fairscore_dataset.csv
+1. Loads realistic_fairscore_dataset.csv (with income distribution-based data)
 2. Trains an XGBoost regressor
 3. Saves model + feature scaler to disk
 """
@@ -17,7 +17,7 @@ import xgboost as xgb
 
 # Paths
 DATA_DIR = Path(__file__).parent.parent.parent.parent / "data"
-DATASET_PATH = DATA_DIR / "synthetic_fairscore_dataset.csv"
+DATASET_PATH = DATA_DIR / "realistic_fairscore_dataset.csv"
 MODEL_DIR = Path(__file__).parent
 MODEL_PATH = MODEL_DIR / "fairscore_model.pkl"
 SCALER_PATH = MODEL_DIR / "fairscore_scaler.pkl"
