@@ -4,18 +4,20 @@ Write-Host "Starting FairStake AI Backend..." -ForegroundColor Green
 
 cd backend
 
-# Check if venv exists
-if (-not (Test-Path "venv")) {
+# Check if venv exists at project root
+if (-not (Test-Path "..\\.venv")) {
     Write-Host "Creating virtual environment..." -ForegroundColor Yellow
-    python -m venv venv
+    cd ..
+    python -m venv .venv
+    cd backend
 }
 
-# Activate venv
+# Activate venv from project root
 Write-Host "Activating virtual environment..." -ForegroundColor Yellow
-& .\venv\Scripts\Activate.ps1
+& ..\.venv\Scripts\Activate.ps1
 
 # Install dependencies if needed
-if (-not (Test-Path "venv\Lib\site-packages\fastapi")) {
+if (-not (Test-Path "..\\.venv\\Lib\\site-packages\\fastapi")) {
     Write-Host "Installing dependencies..." -ForegroundColor Yellow
     pip install -r requirements.txt
 }

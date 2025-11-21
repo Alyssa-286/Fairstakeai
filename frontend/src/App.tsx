@@ -3,6 +3,7 @@ import { Finance360Panel } from './modules/Finance360Panel'
 import { FairScorePanel } from './modules/FairScorePanel'
 import { SchemeSensePanel } from './modules/SchemeSensePanel'
 import { LoanGuardPanel } from './modules/LoanGuardPanel'
+import { ClearClausePanel } from './modules/ClearClausePanel'
 
 const tabs = [
   {
@@ -28,6 +29,12 @@ const tabs = [
     label: 'LoanGuard',
     description: 'Highlight predatory loan clauses instantly.',
     component: <LoanGuardPanel />,
+  },
+  {
+    id: 'clearclause',
+    label: 'ClearClause',
+    description: 'Legal document Q&A, summarization & translation.',
+    component: <ClearClausePanel />,
   },
 ]
 
@@ -83,6 +90,7 @@ function App() {
               <li>FairScore → run with derived features.</li>
               <li>SchemeSense → upload sample scheme.</li>
               <li>LoanGuard → upload loan text.</li>
+              <li>ClearClause → upload docs, Q&A, translate.</li>
             </ol>
           </div>
         </aside>

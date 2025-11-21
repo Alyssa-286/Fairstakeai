@@ -84,10 +84,13 @@ class FairScoreModel:
         # Normalize feature names (handle both avg_monthly_inflow and avg_inflow)
         normalized = {}
         for key, value in features.items():
+            # Map frontend names to backend names
             if key == "avg_monthly_inflow":
                 normalized["avg_inflow"] = value
+                normalized["avg_monthly_inflow"] = value  # Keep both for placeholder
             elif key == "avg_monthly_outflow":
                 normalized["avg_outflow"] = value
+                normalized["avg_monthly_outflow"] = value  # Keep both for placeholder
             else:
                 normalized[key] = value
         

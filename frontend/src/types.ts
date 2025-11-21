@@ -17,6 +17,10 @@ export interface FinanceTransaction {
   amount: number
   direction: 'credit' | 'debit'
   ref: string
+  merchant: string
+  account_type: string
+  account_number: string
+  balance: string
   bank: string
   raw: string
 }

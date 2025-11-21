@@ -9,12 +9,15 @@
 FairStake AI is a unified fintech fairness platform with 4 core modules:
 
 1. **SchemeSense** — Government Scheme Bias Auditor (NLP + PDF Parsing)
+
    - Upload scheme PDFs → Extract clauses → Detect biased eligibility rules → Highlight exclusion risks → Generate Fairness Score
 
 2. **LoanGuard** — Predatory Loan Clause Detector (OCR + NLP)
+
    - Upload loan offers → Detect illegal APR, hidden fees, insurance bundling, auto-renew traps → Generate Risk Report
 
 3. **Finance360** — SMS-Based Financial Behaviour Intelligence
+
    - Paste SMS notifications → Extract UPI spends/income/EMIs → Detect impulsive spending, volatility → Provide nudges → Generate Financial Health Score
 
 4. **FairScore** — Behaviour-Based Credit Scoring (ML + SHAP explainability)
@@ -187,6 +190,7 @@ Use `data/synthetic_sms_examples.txt` — contains realistic SMS transaction dum
 ### Sample Scheme PDFs
 
 Use files in `data/sample_scheme_texts/`:
+
 - `scheme_urban_bias.txt` — Example with urban bias
 - `scheme_student_grant.txt` — Student grant scheme
 - `scheme_gig_inclusive.txt` — Inclusive gig worker scheme
@@ -194,12 +198,14 @@ Use files in `data/sample_scheme_texts/`:
 ### Sample Loan Documents
 
 Use files in `data/sample_loans/`:
+
 - `loan_predatory_pack.txt` — Example with predatory terms
 - `loan_fair_offer.txt` — Fair loan offer example
 
 ### FairScore Dataset
 
 The synthetic dataset at `data/synthetic_fairscore_dataset.csv` contains 1000 rows with features:
+
 - `avg_inflow`, `avg_outflow`, `savings_rate`, `volatility`
 - `academic_score`, `part_time_income`, `emi_count`
 - `label_score` (target)
@@ -305,4 +311,3 @@ Built for hackathon demo in 8–10 hours with modular architecture for easy coll
 - HuggingFace Transformers for NLP capabilities
 - XGBoost + SHAP for ML explainability
 - TailwindCSS for styling
-

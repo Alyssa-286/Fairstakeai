@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚖️ ClearClause - Legal AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            background: #eef2ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Main Chat Area */
+        .main-area {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .ai-avatar {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .message-role {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .message-text {
+            color: #555;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .chat-input-area {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .status {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: #f8f9ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .translate-panel {
+            display: none;
+            padding: 30px;
+        }
+
+        .translate-panel.active {
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .result-box {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>⚖️ ClearClause</h1>
+                <p>Legal AI Assistant</p>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📁 Upload Documents</div>
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📄</div>
+                    <div>Click to upload PDF or DOCX</div>
+                    <input type="file" id="fileInput" accept=".pdf,.docx" multiple>
+                </div>
+                <button class="btn-primary" onclick="uploadDocuments()" style="margin-top: 15px;">Process Documents</button>
+                <div id="fileList" class="file-list"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">📝 Generate Summary</div>
+                <textarea id="summaryInstruction" placeholder="E.g., Provide a one-paragraph summary of key points"></textarea>
+                <button class="btn-primary" onclick="generateSummary()" style="margin-top: 15px;">Generate Summary</button>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🔄 Document Status</div>
+                <div id="statusDisplay" class="status status-info">
+                    No documents uploaded
+                </div>
+            </div>
+
+            <button class="btn-secondary" onclick="clearChat()">Clear Chat History</button>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-area">
+            <div class="chat-header">
+                <h2>Chat & Analysis</h2>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('chat')">💬 Chat</div>
+                    <div class="tab" onclick="switchTab('translate')">🌍 Translate</div>
+                </div>
+            </div>
+
+            <div id="chatTab" class="chat-messages">
+                <div class="message">
+                    <div class="message-avatar ai-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-role">ClearClause</div>
+                        <div class="message-text">
+                            Hello! I'm ClearClause, your Legal AI Assistant. I can help you:<br><br>
+                            • Analyze legal documents (PDF/DOCX)<br>
+                            • Answer questions about your documents<br>
+                            • Provide general legal information<br>
+                            • Generate custom summaries<br>
+                            • Translate text to Hindi or Kannada<br><br>
+                            Upload a document to get started, or ask me any legal question!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="translateTab" class="translate-panel">
+                <h3 style="margin-bottom: 20px;">Translate Legal Text</h3>
+                <textarea id="translateInput" placeholder="Enter English text to translate..." style="min-height: 150px;"></textarea>
+                <select id="targetLanguage">
+                    <option value="Hindi">Hindi (हिन्दी)</option>
+                    <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+                </select>
+                <button class="btn-primary" onclick="translateText()">Translate</button>
+                <div id="translateResult"></div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <textarea id="chatInput" class="chat-input" placeholder="Ask a question about your document or any legal query..." onkeypress="handleKeyPress(event)"></textarea>
+                    <button class="send-btn" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+        let hasDocument = false;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            if (tab === 'chat') {
+                document.getElementById('chatTab').style.display = 'block';
+                document.getElementById('translateTab').classList.remove('active');
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('chatTab').style.display = 'none';
+                document.getElementById('translateTab').classList.add('active');
+                document.querySelectorAll('.tab')[1].classList.add('active');
+            }
+        }
+
+        // File upload
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (this.files.length > 0) {
+                Array.from(this.files).forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.textContent = `📄 ${file.name}`;
+                    fileList.appendChild(fileItem);
+                });
+            }
+        });
+
+        // Upload documents
+        async function uploadDocuments() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                updateStatus('Please select files first', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append('files', file);
+            });
+
+            updateStatus('Processing documents...', 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    hasDocument = true;
+                    updateStatus(`✅ Successfully processed ${result.files.length} document(s)`, 'success');
+                    addMessage('ClearClause', `Documents processed successfully! You can now ask questions about: ${result.files.join(', ')}`);
+                } else {
+                    updateStatus(`Error: ${result.detail}`, 'error');
+                }
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const question = input.value.trim();
+
+            if (!question) return;
+
+            // Add user message
+            addMessage('You', question);
+            input.value = '';
+
+            // Show loading
+            const loadingId = addMessage('ClearClause', '<div class="loading"></div>');
+
+            try {
+                const response = await fetch(`${API_URL}/api/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: question,
+                        use_document: hasDocument
+                    })
+                });
+
+                const result = await response.json();
+
+                // Remove loading and add answer
+                removeMessage(loadingId);
+                addMessage('ClearClause', result.answer);
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage('ClearClause', `Error: ${error.message}`);
+            }
+        }
+
+        // Generate summary
+        async function generateSummary() {
+            if (!hasDocument) {
+                updateStatus('Please upload documents first', 'error');
+                return;
+            }
+
+            const instruction = document.getElementById('summaryInstruction').value || 'Provide a comprehensive summary';
+            
+            const loadingId = addMessage('ClearClause', '<div class="loading"></div> Generating summary...');
+
+            try {
+                const response = await fetch(`${API_URL}/api/summarize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ instruction })
+                });
+
+                const result = await response.json();
+
+                removeMessage(loadingId);
+                addMessage('ClearClause', `<strong>📝 Summary (${instruction}):</strong><br><br>${result.summary}`);
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage('ClearClause', `Error: ${error.message}`);
+            }
+        }
+
+        // Translate text
+        async function translateText() {
+            const text = document.getElementById('translateInput').value.trim();
+            const language = document.getElementById('targetLanguage').value;
+            const resultDiv = document.getElementById('translateResult');
+
+            if (!text) {
+                resultDiv.innerHTML = '<div class="status status-error">Please enter text to translate</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="status status-info"><div class="loading"></div> Translating...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/translate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        target_language: language
+                    })
+                });
+
+                const result = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="result-box">
+                        <strong>${language} Translation:</strong><br><br>
+                        ${result.translated}
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="status status-error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Helper functions
+        function addMessage(role, text) {
+            const messagesDiv = document.getElementById('chatTab');
+            const messageId = Date.now();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.id = `msg-${messageId}`;
+            messageDiv.innerHTML = `
+                <div class="message-avatar ${role === 'You' ? 'user-avatar' : 'ai-avatar'}">
+                    ${role === 'You' ? '👤' : '🤖'}
+                </div>
+                <div class="message-content">
+                    <div class="message-role">${role}</div>
+                    <div class="message-text">${text}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            return messageId;
+        }
+
+        function removeMessage(id) {
+            const msg = document.getElementById(`msg-${id}`);
+            if (msg) msg.remove();
+        }
+
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('statusDisplay');
+            statusDiv.className = `status status-${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function clearChat() {
+            const messagesDiv = document.getElementById('chatTab');
+            messagesDiv.innerHTML = `
+                <div class="message">
+                    <div class="message-avatar ai-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="message-role">ClearClause</div>
+                        <div class="message-text">Chat history cleared. How can I help you?</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
