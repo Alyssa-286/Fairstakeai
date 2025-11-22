@@ -23,10 +23,17 @@ export const sampleSchemeResponse = {
   summary: 'Eligibility criteria favours salaried urban male applicants. Introduce alternative proofs and geographic inclusion.',
 }
 
-export const sampleSMSDump = `Rs.150.00 debited A/cXX6597 and credited to Vedamurthy M S via UPI Ref No 108589157513 on 17Nov25. Call 18001031906, if not done by you. -BOI
-Rs.5500.00 credited in A/cXX6597 via NEFT Ref 894561235489 on 17Nov25. -BOI
-Rs.899.00 debited from A/cXX6597 using UPI Ref 124578965412 on 18Nov25 at Myntra. -BOI
-Rs.1200.00 debited from A/cXX6597 towards EMI on 19Nov25 Ref 785412369874 -BOI`
+export const sampleSMSDump = `Rs.150.00 debited from A/c **1234 on 05-Feb-19 at 07:27:11. Avl Bal- Rs.2343.23. Not you? Call 1800111111 -Axis Bank
+Rs.2000.00 debited from A/c no. XX3423 on 05-02-19 07:27:11 IST at ECS PAY. Avl Bal- INR 5343.23 -ICICI
+INR 500.00 debited from A/c **4770 on 08-05-19 at Swiggy. Avl bal: INR 4843.23 -HDFC
+Rs.1200 spent on Kotak Bank Credit Card XX1234 at AMAZON on 12-Nov-19. Avl limit: Rs.98765.00
+Rs.250.00 added to your Paytm Wallet. Txn ID: 12345678. Balance: Rs.1500.00
+Rs.299.00 paid via PhonePe to Zomato. UPI Ref: 987654321098. Balance: Rs.1201.00
+You paid Rs.150.00 to Swiggy via Google Pay. UPI ID: merchant@okaxis. Ref: 123456789012
+Rs.5000.00 debited from A/c XX6789 on 15-Nov-19. Info: NEFT-N123456789. Avl Bal: Rs.45678.90 -SBI
+Rs.899.00 debited from Card XX1234 at MYNTRA on 18-Nov-19. Avl Credit Limit: Rs.87654.00 -Federal Bank
+Rs.3500.00 credited to A/c XX4567 via IMPS. Ref: IDFCIMPS123456. Balance: Rs.49178.90 -IDFC
+Rs.601.00 paid thru A/C XX4770 on 08-5-25 13:10:53 to AMAZON SELLER S, UPI Ref 284611545284 -Canara Bank`
 
 export const sampleFairScoreFeatures = {
   avg_monthly_inflow: 12000,

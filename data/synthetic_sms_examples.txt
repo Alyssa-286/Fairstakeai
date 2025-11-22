@@ -9,3 +9,5 @@ Rs.12500.00 credited via salary in A/cXX6597 on 01Dec25 Ref SAL1125. -BOI
 Rs.2500.00 debited via standing instruction toward Rent on 03Dec25 Ref RENT1203. -BOI
 Rs.399.00 debited from A/cXX6597 via OTT subscription on 04Dec25. -BOI
 
+
+

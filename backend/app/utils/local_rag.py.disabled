@@ -1,0 +1,144 @@
+import os
+from pathlib import Path
+from typing import List, Dict, Any, Tuple
+
+import chromadb
+from chromadb.utils import embedding_functions
+from sentence_transformers import SentenceTransformer
+from pypdf import PdfReader
+
+
+DEFAULT_DB_DIR = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
+DEFAULT_CONTRACTS_DIR = Path(__file__).parent.parent.parent.parent / "data" / "contracts"
+COLLECTION_NAME = "clearclause_contracts"
+
+
+class LocalRAG:
+    def __init__(self, contracts_dir: Path | str = DEFAULT_CONTRACTS_DIR, db_dir: Path | str = DEFAULT_DB_DIR):
+        self.contracts_dir = Path(contracts_dir)
+        self.db_dir = Path(db_dir)
+        self.db_dir.mkdir(parents=True, exist_ok=True)
+
+        # Use a free, well-known embedding model
+        self.model_name = os.getenv("LOCAL_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+        self._st_model = SentenceTransformer(self.model_name)
+
+        # ChromaDB client and collection
+        self._client = chromadb.PersistentClient(path=str(self.db_dir))
+        self._collection = self._client.get_or_create_collection(
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
+        )
+
+    def _chunk_text(self, text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
+        chunks = []
+        start = 0
+        while start < len(text):
+            end = min(start + chunk_size, len(text))
+            chunk = text[start:end]
+            chunks.append(chunk)
+            if end == len(text):
+                break
+            start = end - overlap
+            if start < 0:
+                start = 0
+        return chunks
+
+    def _embed(self, texts: List[str]) -> List[List[float]]:
+        # SentenceTransformer returns numpy arrays; convert to lists
+        vecs = self._st_model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
+        return [v.tolist() for v in (vecs if hasattr(vecs, "tolist") else vecs)]
+
+    def ingest(self) -> Dict[str, Any]:
+        """Ingest all PDFs in the contracts directory into ChromaDB."""
+        if not self.contracts_dir.exists():
+            self.contracts_dir.mkdir(parents=True, exist_ok=True)
+        pdf_paths = sorted(self.contracts_dir.glob("**/*.pdf"))
+
+        total_pages = 0
+        total_chunks = 0
+        upsert_ids = []
+        upsert_docs = []
+        upsert_metas = []
+
+        for pdf_path in pdf_paths:
+            try:
+                reader = PdfReader(str(pdf_path))
+            except Exception:
+                continue
+
+            for page_idx, page in enumerate(reader.pages):
+                try:
+                    text = page.extract_text() or ""
+                except Exception:
+                    text = ""
+                if not text.strip():
+                    continue
+                total_pages += 1
+                chunks = self._chunk_text(text)
+                for i, ch in enumerate(chunks):
+                    cid = f"{pdf_path.name}-p{page_idx+1}-c{i+1}"
+                    upsert_ids.append(cid)
+                    upsert_docs.append(ch)
+                    upsert_metas.append({
+                        "file": pdf_path.name,
+                        "path": str(pdf_path),
+                        "page": page_idx + 1,
+                    })
+                    total_chunks += 1
+
+        if upsert_docs:
+            embeddings = self._embed(upsert_docs)
+            self._collection.upsert(ids=upsert_ids, documents=upsert_docs, metadatas=upsert_metas, embeddings=embeddings)
+
+        return {
+            "files": len(pdf_paths),
+            "pages": total_pages,
+            "chunks": total_chunks,
+            "collection_count": self._collection.count()
+        }
+
+    def ensure_index(self) -> Dict[str, Any]:
+        # If empty collection and dir has PDFs, ingest
+        if self._collection.count() == 0:
+            return self.ingest()
+        return {"collection_count": self._collection.count(), "skipped": True}
+
+    def query(self, question: str, top_k: int = 5) -> Dict[str, Any]:
+        if self._collection.count() == 0:
+            self.ensure_index()
+        q_emb = self._embed([question])[0]
+        results = self._collection.query(query_embeddings=[q_emb], n_results=top_k, include=["documents", "metadatas", "distances"])
+        docs = results.get("documents", [[]])[0]
+        metas = results.get("metadatas", [[]])[0]
+        dists = results.get("distances", [[]])[0]
+
+        # Simple extractive answer: join top snippets
+        answer = "\n\n".join([f"- {d.strip()}" for d in docs[:min(3, len(docs))]]) or "No relevant passages found."
+
+        citations = []
+        for doc, meta, dist in zip(docs, metas, dists):
+            citations.append({
+                "s3_object": meta.get("path"),  # keep key compatible with UI
+                "page": meta.get("page"),
+                "snippet": doc[:500],
+                "confidence": max(0.0, 1.0 - float(dist)) if dist is not None else None,
+                "raw_metadata": meta,
+            })
+
+        return {
+            "answer": answer,
+            "citations": citations,
+            "debug": {"returned": len(docs)}
+        }
+
+
+# Convenience singletons (module-level) to reuse model and client
+_LOCAL_RAG = None
+
+
+def get_local_rag() -> LocalRAG:
+    global _LOCAL_RAG
+    if _LOCAL_RAG is None:
+        _LOCAL_RAG = LocalRAG()
+    return _LOCAL_RAG

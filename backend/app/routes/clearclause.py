@@ -4,18 +4,16 @@ Legal document analysis, Q&A, summarization, and translation
 """
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Dict, Any
 import os
 
-from ..utils.legal_processor import (
-    LegalDocumentProcessor,
-    translate_text
-)
+# Lazy import to avoid PyTorch DLL errors on startup
+# from ..utils.local_rag import get_local_rag
 
 router = APIRouter()
 
-# Global processor instance
-processor = LegalDocumentProcessor()
+# Lazy-initialized processor to avoid heavy imports at startup
+processor = None
 
 # --- Request/Response Models ---
 class QuestionRequest(BaseModel):
@@ -38,10 +36,23 @@ class ChatResponse(BaseModel):
 @router.get("/health")
 async def health_check():
     """Health check endpoint for ClearClause module"""
+    # Initialize minimal flags without importing heavy modules
+    api_key_configured = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
+    has_doc = False
+    try:
+        global processor
+        if processor is None:
+            # don't import heavy module unless needed
+            pass
+        else:
+            has_doc = bool(getattr(processor, "vector_store", None) is not None or getattr(processor, "raw_text", ""))
+    except Exception:
+        has_doc = False
+
     return {
         "status": "healthy",
-        "document_loaded": bool(getattr(processor, "vector_store", None) is not None or getattr(processor, "raw_text", "")),
-        "api_key_configured": bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"))
+        "document_loaded": has_doc,
+        "api_key_configured": api_key_configured
     }
 
 @router.post("/upload")
@@ -62,7 +73,12 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 f.write(content)
             file_paths.append(file_path)
         
-        # Process documents
+        # Lazy import and initialize processor
+        global processor
+        if processor is None:
+            from ..utils.legal_processor import LegalDocumentProcessor  # defer heavy import
+            processor = LegalDocumentProcessor()
+
         success = processor.process_documents(file_paths)
         
         # Clean up temp files
@@ -90,6 +106,7 @@ async def ask_question(request: QuestionRequest):
     Ask a question - either about uploaded documents or general legal query
     """
     try:
+        global processor
         if request.use_document:
             if not processor.vector_store:
                 raise HTTPException(
@@ -99,6 +116,9 @@ async def ask_question(request: QuestionRequest):
             answer = processor.handle_document_qna(request.question)
             source = "document"
         else:
+            if processor is None:
+                from ..utils.legal_processor import LegalDocumentProcessor  # defer
+                processor = LegalDocumentProcessor()
             answer = processor.handle_general_qna(request.question)
             source = "general"
         
@@ -113,6 +133,10 @@ async def generate_summary(request: SummaryRequest):
     Generate a custom summary of uploaded documents
     """
     try:
+        global processor
+        if processor is None:
+            from ..utils.legal_processor import LegalDocumentProcessor
+            processor = LegalDocumentProcessor()
         if not processor.raw_text:
             raise HTTPException(
                 status_code=400,
@@ -142,6 +166,8 @@ async def translate(request: TranslateRequest):
                 detail="Target language must be 'Hindi' or 'Kannada'"
             )
         
+        # Lazy import translate function
+        from ..utils.legal_processor import translate_text
         translated = translate_text(request.text, request.target_language)
         
         return {
@@ -155,15 +181,89 @@ async def translate(request: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/clear")
-async def clear_data():
+async def clear_documents():
     """
     Clear all uploaded documents and reset the processor
     """
     try:
-        processor.clear()
+        global processor
+        if processor is not None:
+            processor.clear()
         return {
             "status": "success",
             "message": "All data cleared successfully"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Local RAG Endpoint ---
+
+class LocalRAGRequest(BaseModel):
+    query: str
+
+class LocalRAGCitation(BaseModel):
+    filename: str
+    page: int
+    snippet: str
+    relevance: float  # 0-1 score
+
+class LocalRAGResponse(BaseModel):
+    answer: str
+    reasoning: Optional[str] = None
+    citations: List[Dict[str, Any]]
+    raw_response: Optional[Dict[str, Any]] = None
+
+@router.post("/local-rag-query")
+async def local_rag_query(request: LocalRAGRequest):
+    """
+    Query local ChromaDB RAG system (FREE, no AWS needed).
+    
+    How it works:
+    1. Searches data/chroma_db for relevant contract chunks
+    2. Uses free sentence-transformers embeddings
+    3. Generates answer with Gemini API (free tier)
+    4. Returns answer + citations (filename, page, snippet)
+    
+    Difference from AWS RAG:
+    - Local: FREE, runs on your computer, needs rag_ingest.py run first
+    - AWS: Cloud-based, scalable, costs ~$10-15/month
+    
+    Example:
+    POST /api/clearclause/local-rag-query
+    {"query": "What is the notice period for cheque bounce?"}
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        logger.info(f"Processing RAG query: {request.query[:50]}...")
+        # TEMPORARY: Return error message for hackathon - PyTorch DLL issue
+        return {
+            "answer": "⚠️ Local RAG is temporarily disabled. Please toggle to 'AWS RAG' at the top of this page to use cloud-powered contract Q&A.",
+            "reasoning": "Switch the toggle from 'Local RAG' to 'AWS RAG' for full functionality.",
+            "citations": [],
+            "raw_response": {"error": "local_rag_disabled", "hint": "use_aws_rag"}
+        }
+    
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        error_trace = traceback.format_exc()
+        logger.error(f"RAG query error: {error_msg}\n{error_trace}")
+        
+        if "not found" in error_msg.lower() and "collection" in error_msg.lower():
+            raise HTTPException(
+                status_code=404,
+                detail="ChromaDB collection not found. Please run: python backend/app/utils/rag_ingest.py"
+            )
+        elif "GEMINI_API_KEY" in error_msg or "api key" in error_msg.lower():
+            raise HTTPException(
+                status_code=500,
+                detail="Gemini API key not configured. Please set GEMINI_API_KEY in backend/.env"
+            )
+        else:
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Local RAG error: {error_msg}. Check backend logs for details."
+            )

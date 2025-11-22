@@ -274,3 +274,5 @@ Currently, no authentication is required for MVP. Production should add API keys
 
 The API allows CORS from `http://localhost:5173` (Vite default) for development. Production should configure allowed origins appropriately.
 
+
+

@@ -33,3 +33,5 @@ Write-Host "Starting FastAPI server on http://localhost:8000" -ForegroundColor G
 Write-Host "API docs available at http://localhost:8000/docs" -ForegroundColor Cyan
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
+
+

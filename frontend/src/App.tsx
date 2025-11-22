@@ -4,6 +4,7 @@ import { FairScorePanel } from './modules/FairScorePanel'
 import { SchemeSensePanel } from './modules/SchemeSensePanel'
 import { LoanGuardPanel } from './modules/LoanGuardPanel'
 import { ClearClausePanel } from './modules/ClearClausePanel'
+import RAGPanel from './modules/RAGPanel'
 
 const tabs = [
   {
@@ -35,6 +36,12 @@ const tabs = [
     label: 'ClearClause',
     description: 'Legal document Q&A, summarization & translation.',
     component: <ClearClausePanel />,
+  },
+  {
+    id: 'contractqa',
+    label: 'Contract Q&A',
+    description: 'AWS Bedrock RAG for contract analysis with citations.',
+    component: <RAGPanel />,
   },
 ]
 

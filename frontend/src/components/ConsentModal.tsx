@@ -34,3 +34,5 @@ export const ConsentModal = ({ open, onAccept, onDecline }: ConsentModalProps) =
 }
 
 
+
+

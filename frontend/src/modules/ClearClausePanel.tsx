@@ -87,7 +87,7 @@ export const ClearClausePanel = () => {
 
   const handleSummarize = async () => {
     if (!documentStatus.loaded) {
-      setStatus({ error: 'Please upload documents first' })
+      setStatus({ loading: false, error: 'Please upload documents first' })
       return
     }
 

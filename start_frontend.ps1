@@ -15,3 +15,5 @@ Write-Host "Starting Vite dev server..." -ForegroundColor Green
 Write-Host "Frontend will be available at http://localhost:5173" -ForegroundColor Cyan
 npm run dev
 
+
+

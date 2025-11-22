@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import schemesense, finance360, fairscore, loanguard, clearclause
+from .routes import schemesense, finance360, fairscore, loanguard, clearclause, rag
 
 
 def create_app() -> FastAPI:
@@ -24,6 +24,7 @@ def create_app() -> FastAPI:
     app.include_router(fairscore.router, prefix="/api/fairscore", tags=["FairScore"])
     app.include_router(loanguard.router, prefix="/api/loanguard", tags=["LoanGuard"])
     app.include_router(clearclause.router, prefix="/api/clearclause", tags=["ClearClause"])
+    app.include_router(rag.router, tags=["RAG"])
 
     @app.get("/health", tags=["Utility"])
     async def health_check():
